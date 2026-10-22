@@ -1,0 +1,322 @@
+{
+  "schema_version": 1,
+  "source_apk_name": "com.ydgn.doka.apk",
+  "source_apk_sha256": "5d076292c2bad22259661bac7f1502142001e0bebca60830743ee915d943d0a1",
+  "cube_dimension": 64,
+  "format": "RGB8, R fastest, G second, B third; PNG alpha discarded",
+  "mapping": "cube[(b*64*64+g*64+r)*3] = PNG[(b%8)*64+r, (b//8)*64+g].rgb",
+  "luts": [
+    {
+      "id": "lut_agfa_ap_100",
+      "source_member": "assets/luts/lut_agfa_ap_100.png",
+      "png_sha256": "e74213e89c22da4575a247348042d6b9e4a6edf8e4029f3b66fd6f174e525214",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_agfa_ap_100.rgb8",
+      "rgb8_sha256": "5903de2c73f55febbefeae8c3bca17c719d9a7caf3a54b6d97ee5818a0cbe5b9",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_agfa_vista_800",
+      "source_member": "assets/luts/lut_agfa_vista_800.png",
+      "png_sha256": "558f007cda002013d5930dd7b7463ca5491d9892469a36e1766684bb1816eebd",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_agfa_vista_800.rgb8",
+      "rgb8_sha256": "1aef1142829c67a20a6d68e65187dac4cc03b8a467a03053c02b38bc41c90c3a",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_s100",
+      "source_member": "assets/luts/lut_doka_s100.png",
+      "png_sha256": "6a77588b372bf5b9cc3f4c5ada2c870a84c0e3abc9961ef8c4b660f5e5b86fe6",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_s100.rgb8",
+      "rgb8_sha256": "56ca99450c58dbf6afc4839b65eb22ca16e71b43fbe2e08f8441922d16368c4b",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_s160",
+      "source_member": "assets/luts/lut_doka_s160.png",
+      "png_sha256": "310b2db3c1281403cc91e72ecd29564f84d41c5f401acf4ed2fb62809eb49d2e",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_s160.rgb8",
+      "rgb8_sha256": "098846fe533efd9fbfbe77d7d1956d18bb37beb448478b8ddf72982f2b79174c",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_s200",
+      "source_member": "assets/luts/lut_doka_s200.png",
+      "png_sha256": "8a1c46d3049be73a449555a3c564f76ecab1dc4e1249404287b1042e4b8e0e9d",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_s200.rgb8",
+      "rgb8_sha256": "f783b899e1ee5d72c571387f1eb36aace135d114aba935c25e6f33581f051d23",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_s400",
+      "source_member": "assets/luts/lut_doka_s400.png",
+      "png_sha256": "cfc31c80e2cf44d4977653d138b245ee3a99b003e155bc3e252a25664989ed13",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_s400.rgb8",
+      "rgb8_sha256": "b5a2734de1617a061132ddd43dac5bac9b73fb9e151cc5a8a0e44ea37d97c4d4",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_s50",
+      "source_member": "assets/luts/lut_doka_s50.png",
+      "png_sha256": "95acec5a649aefc10b868e7195680d8c6caaa4bedb04a7200ded950d72fb7fba",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_s50.rgb8",
+      "rgb8_sha256": "da55396de6b6c80236175d4dc4e54e21f7add45f260e5767e8a31c1969545d8b",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_x100",
+      "source_member": "assets/luts/lut_doka_x100.png",
+      "png_sha256": "dcf69a845993d48f36d4e530cffff6e1eae46d3ab33cbad875d359cb270171a6",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_x100.rgb8",
+      "rgb8_sha256": "ad791f69bb733e1356d0247f4e8f0b87ba2651393694b32470bb69f37ae11714",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_doka_x400",
+      "source_member": "assets/luts/lut_doka_x400.png",
+      "png_sha256": "485f130861cc11fb91b6fbae405fbf81299ac2269969b1a69295049ba83d04b9",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_doka_x400.rgb8",
+      "rgb8_sha256": "5aee20319de2d3408a2b43dca68789828f12e5bd7f2c5130699a98b7fdec68e3",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_160c",
+      "source_member": "assets/luts/lut_f_160c.png",
+      "png_sha256": "a64bd0b92b1063ab76fb33cd6b52bf8f62b84ff6950e616cd2af504be1aae789",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_160c.rgb8",
+      "rgb8_sha256": "56b51094d1842fd2b8b9e7409ef4c019ed4c9865fe9ee2d930576d98fe8c8523",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_400h",
+      "source_member": "assets/luts/lut_f_400h.png",
+      "png_sha256": "14573f385742c7e99656a7247736378674767c02e88fa907265c4e017466810a",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_400h.rgb8",
+      "rgb8_sha256": "29f6e9386bfdaa76073d63fbbda6f84d4a52d68ec3aab2bc2aa4de7ac1bef792",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_c200",
+      "source_member": "assets/luts/lut_f_c200.png",
+      "png_sha256": "9ff170abe08d34ef0acd4576e761cfa0761d8d3075732b0bf61843ae249d9bb9",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_c200.rgb8",
+      "rgb8_sha256": "e97c5b509f365ec63287993f9492ff7640c9ba9e3f6bfe36f77fea4e5e0e4f66",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_cc",
+      "source_member": "assets/luts/lut_f_cc.png",
+      "png_sha256": "f5615c70669151b3427c253a4959ca18d921349b5dd010e8a63ed946f6b4b9eb",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_cc.rgb8",
+      "rgb8_sha256": "bef955f500c6a948383e60f029f3aa255ca173fbeccdc253030a1186a58ebe7e",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_classic_chrome",
+      "source_member": "assets/luts/lut_f_classic_chrome.png",
+      "png_sha256": "5422d30bc458462264756d6dc542e46d164172c31c2ecdcc40953f67be4f9bfd",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_classic_chrome.rgb8",
+      "rgb8_sha256": "2741492754a55972a1fc27f2443ef4bf0c45164f3ed1b620a0ab3f15be99ede8",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_classic_neg",
+      "source_member": "assets/luts/lut_f_classic_neg.png",
+      "png_sha256": "0d8fa1c01638c2108e348d733bb2e86f3689daa200f5118d1db27b91d81f01aa",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_classic_neg.rgb8",
+      "rgb8_sha256": "87fd57ef21383437ba9ff0fdb61c1868b737a431a2b892524b65fc12828ae819",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_cn",
+      "source_member": "assets/luts/lut_f_cn.png",
+      "png_sha256": "748ff0afc91ca7ef4cddc97e8470de9c263988ed9d8c34efb3c8107facbb3052",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_cn.rgb8",
+      "rgb8_sha256": "cd5dd5e91f1d985b3bf61f13a33659454fc8cdab7d2ae751fb2f182592f7c548",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_pro_neg",
+      "source_member": "assets/luts/lut_f_pro_neg.png",
+      "png_sha256": "d0548af95a60dca85b2aff5e4ca0d8dc24659fd3425c78cd86cc5c1d0626fb54",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_pro_neg.rgb8",
+      "rgb8_sha256": "2798fe9007e04e08f0a0d52b2c5151659d24ebf45b8fd6ca85f1020e8f3b3d3b",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_provia",
+      "source_member": "assets/luts/lut_f_provia.png",
+      "png_sha256": "bc986da7e6cee71cf53cd4d1b8302f0ed437459b65fcdeb5d50b7563ab59d9f7",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_provia.rgb8",
+      "rgb8_sha256": "0243a1140fa965e5fcdb5d926698a9d56b9aeebec96ba38bbc2a5a993b82ebd4",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_s100",
+      "source_member": "assets/luts/lut_f_s100.png",
+      "png_sha256": "3701ea1b77c78fb03fa625250f4c7dfd59eb571b3090d15a4b610235dac55c66",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_s100.rgb8",
+      "rgb8_sha256": "ae8dda6f61e07bfa26111daa7cd50a66160b8dbe6482ff5a6a7e2d175bc8b960",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_s400",
+      "source_member": "assets/luts/lut_f_s400.png",
+      "png_sha256": "d225139749d67a273357e9ba8022daeb1a43fbf257ee5e660d422cad7478131a",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_s400.rgb8",
+      "rgb8_sha256": "23a2d8e77895b0c78f68f3d0e9dfdb196af79b15c1928dbb0abac20adead73ec",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_f_velvia",
+      "source_member": "assets/luts/lut_f_velvia.png",
+      "png_sha256": "fcd7ec6d9e32e19909dac0e105e5dbcfd92b4a06f7155794a5d1c89afc97f1b0",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_f_velvia.rgb8",
+      "rgb8_sha256": "a8247dde9df7895ebdf96c0d14892544e12d181d55ed07f2e9c7f78e2a299c35",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_k_gold_200",
+      "source_member": "assets/luts/lut_k_gold_200.png",
+      "png_sha256": "687ffc365affaf0475d721e6d91cdc71678753f7847ed465fa074bcfcf785392",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_k_gold_200.rgb8",
+      "rgb8_sha256": "367dff4cb90f8b14f4b48f6110d5423d0b3b9f337c2e5eab8bd0bbca56869f82",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_k_portra_160",
+      "source_member": "assets/luts/lut_k_portra_160.png",
+      "png_sha256": "553a4db45efa4c0330944f84049764fd26fea828e675c420e7c51016519f2eda",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_k_portra_160.rgb8",
+      "rgb8_sha256": "9baf08a1a984a68f697f90e1412c566d90dbabc9ce09d4f56bba4a317a1ad944",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    },
+    {
+      "id": "lut_k_portra_400",
+      "source_member": "assets/luts/lut_k_portra_400.png",
+      "png_sha256": "09dff1441c906e6e8c8361f7bcf330854cd2b47cea6912b5f9f576918c7295ad",
+      "png_dimensions": [
+        512,
+        512
+      ],
+      "output": "Doka/Resources/LUTs/lut_k_portra_400.rgb8",
+      "rgb8_sha256": "e611bc0992a56040dc173b0ea02edac7a8ae21229e4c1ade54e0934271673d1f",
+      "rgb8_bytes": 786432,
+      "cube_dimension": 64
+    }
+  ]
+}

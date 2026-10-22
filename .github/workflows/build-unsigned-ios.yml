@@ -1,0 +1,37 @@
+name: Build unsigned iOS IPA
+
+# Prepared locally only. Triggering requires a GitHub repository with Actions enabled.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install project generator
+        run: brew install xcodegen
+      - name: Build and verify unsigned device IPA
+        run: bash scripts/build-unsigned-ipa.sh
+      - name: Retain build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doka-ios-build-log
+          path: work/build/**/xcodebuild.log
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Doka-unsigned
+          path: |
+            artifacts/Doka-unsigned.ipa
+            artifacts/Doka-unsigned.ipa.sha256
+            artifacts/Doka-unsigned.verification.json
+          if-no-files-found: error
+          retention-days: 14

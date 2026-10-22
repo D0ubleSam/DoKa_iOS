@@ -1,0 +1,15 @@
+work/
+build/
+dist/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+*.p12
+*.mobileprovision
+*.p8
+.env
+.env.*
+artifacts/
+*.xcodeproj/
+__pycache__/
