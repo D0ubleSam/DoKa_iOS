@@ -6,6 +6,7 @@ final class CompositionModel: ObservableObject {
     @Published private(set) var isAnalyzing = false
     @Published private(set) var isAuthenticated = AIService.shared.hasToken
     @Published private(set) var result: AICompositionResult?
+    @Published private(set) var targetPreview: UIImage?
     @Published private(set) var trackedRect: CGRect?
     @Published private(set) var isTrackingLost = false
     @Published private(set) var status = ""
@@ -91,6 +92,11 @@ final class CompositionModel: ObservableObject {
                 try Task.checkCancellation()
                 guard self.generation == requestID else { return }
                 self.result = result
+                let pixels = CGRect(x: result.rect.minX * CGFloat(frame.width),
+                                    y: result.rect.minY * CGFloat(frame.height),
+                                    width: result.rect.width * CGFloat(frame.width),
+                                    height: result.rect.height * CGFloat(frame.height)).integral
+                if let crop = frame.cropping(to: pixels) { self.targetPreview = UIImage(cgImage: crop) }
                 self.isAnalyzing = false
                 self.status = "正在定位推荐画面"
                 self.trackingQueue.async { [weak self] in
@@ -128,6 +134,7 @@ final class CompositionModel: ObservableObject {
         generation = UUID()
         isAnalyzing = false
         result = nil
+        targetPreview = nil
         trackedRect = nil
         trackerReady = false
         trackingBusy = false

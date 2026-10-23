@@ -17,24 +17,28 @@ private final class AIOriginRedirectDelegate: NSObject, URLSessionTaskDelegate {
     }
 }
 
-@MainActor
 final class AIService {
     static let shared = AIService()
     private let baseURL = URL(string: "https://www.yindoka.com/")!
     private let tokenStore = AITokenStore()
+    private let authenticationLock = NSLock()
+    private var authenticationGeneration: UInt = 0
     private let redirectDelegate = AIOriginRedirectDelegate()
-    private lazy var session: URLSession = {
+    private let session: URLSession
+
+    private static func makeSession(delegate: AIOriginRedirectDelegate) -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 40
         configuration.httpCookieAcceptPolicy = .never
         configuration.httpShouldSetCookies = false
         configuration.urlCache = nil
-        return URLSession(configuration: configuration, delegate: redirectDelegate, delegateQueue: nil)
-    }()
+        return URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+    }
     private let installationID: String
 
     private init() {
+        session = Self.makeSession(delegate: redirectDelegate)
         let key = "doka-ios-installation-id"
         if let saved = UserDefaults.standard.string(forKey: key) {
             installationID = saved
@@ -44,9 +48,17 @@ final class AIService {
         }
     }
 
-    var hasToken: Bool { ((try? tokenStore.read()) ?? nil)?.isEmpty == false }
+    var hasToken: Bool {
+        guard let token = try? tokenStore.read() else { return false }
+        return !token.isEmpty
+    }
 
-    func logout() throws { try tokenStore.delete() }
+    func logout() throws {
+        try authenticationLock.withLock {
+            authenticationGeneration &+= 1
+            try tokenStore.delete()
+        }
+    }
 
     /// The UI calls this only in response to the user's explicit Send Code action.
     func sendCode(phone: String) async throws {
@@ -62,6 +74,10 @@ final class AIService {
         guard (4...8).contains(code.count), code.allSatisfy({ $0.isASCII && $0.isNumber }) else {
             throw AIServiceError.invalidVerificationCode
         }
+        let generation = authenticationLock.withLock { () -> UInt in
+            authenticationGeneration &+= 1
+            return authenticationGeneration
+        }
         let body = try JSONSerialization.data(withJSONObject: ["phone_num": phone, "msg_code": code, "username": ""])
         let payload: AIAuthPayload? = try await perform(path: "ai_camera/auth/login", body: body,
                                                        contentType: "application/json", authenticated: false)
@@ -69,7 +85,11 @@ final class AIService {
               !token.contains("\r"), !token.contains("\n"), token.utf8.count <= 16_384 else {
             throw AIServiceError.malformedResponse
         }
-        try tokenStore.save(token)
+        try Task.checkCancellation()
+        try authenticationLock.withLock {
+            guard generation == authenticationGeneration else { throw CancellationError() }
+            try tokenStore.save(token)
+        }
     }
 
     func analyze(jpeg: Data, width: Int, height: Int, zoomFactor: Double,
@@ -80,6 +100,13 @@ final class AIService {
             throw AIServiceError.invalidImage
         }
         guard hasToken else { throw AIServiceError.authenticationRequired }
+        let entitlement: AIEntitlementPayload? = try await perform(
+            path: "ai_camera/vip/status", body: nil, contentType: nil,
+            authenticated: true, method: "GET"
+        )
+        guard let entitlement else { throw AIServiceError.malformedResponse }
+        guard entitlement.canCompose else { throw AIServiceError.compositionUnavailable }
+        try Task.checkCancellation()
         let milliseconds = Int64(Date().timeIntervalSince1970 * 1000)
         let fields: [String: String] = [
             "shoot_type": "scenery", "direction": "shu",
@@ -107,12 +134,12 @@ final class AIService {
         return phone
     }
 
-    private func perform<Payload: Decodable>(path: String, body: Data, contentType: String,
-                                             authenticated: Bool) async throws -> Payload? {
+    private func perform<Payload: Decodable>(path: String, body: Data?, contentType: String?,
+                                             authenticated: Bool, method: String = "POST") async throws -> Payload? {
         let token = authenticated ? try tokenStore.read() : nil
         if authenticated && (token?.isEmpty != false) { throw AIServiceError.authenticationRequired }
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
-        request.httpMethod = "POST"
+        request.httpMethod = method
         request.httpBody = body
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -122,9 +149,11 @@ final class AIService {
         request.setValue("china", forHTTPHeaderField: "X-Region")
         request.setValue("store", forHTTPHeaderField: "X-Distribution")
         request.setValue(requestLanguage, forHTTPHeaderField: "X-Language")
-        let model = UIDevice.current.model
+        let (model, osVersion) = await MainActor.run {
+            (UIDevice.current.model, UIDevice.current.systemVersion)
+        }
         let metadata: [String: String] = [
-            "os_type": "iOS", "os_version": UIDevice.current.systemVersion,
+            "os_type": "iOS", "os_version": osVersion,
             "Device-ID": "Apple \(model)", "device_id": "Apple \(model)",
             "deviceUUID": installationID, "device_uuid": installationID,
             "device_model": model, "device_marketname": model,
@@ -160,15 +189,17 @@ final class AIService {
     }
 
     private func invalidateIfCurrent(_ sentToken: String?) throws {
-        guard let sentToken, try tokenStore.read() == sentToken else { return }
-        try tokenStore.delete()
+        try authenticationLock.withLock {
+            guard let sentToken, try tokenStore.read() == sentToken else { return }
+            try tokenStore.delete()
+        }
     }
 
     static func multipart(fields: [String: String], jpeg: Data, filename: String, boundary: String) -> Data {
         var body = Data()
         func append(_ text: String) { body.append(Data(text.utf8)) }
         for key in fields.keys.sorted() {
-            append("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(key)\"\r\n\r\n\(fields[key]!)\r\n")
+            append("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(key)\"\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n\(fields[key]!)\r\n")
         }
         append("--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\nContent-Type: image/jpeg\r\n\r\n")
         body.append(jpeg)

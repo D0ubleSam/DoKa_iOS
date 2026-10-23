@@ -33,6 +33,7 @@ final class CameraModel: ObservableObject {
     private var frameInFlight = false
     private var lastFrameTime = CFAbsoluteTimeGetCurrent()
     private var revision = 0
+    private var cameraFrameGeneration = 0
     private var editorSource: CIImage?
     private var capturedSettings: RenderSettings?
     private var lastJPEG: Data?
@@ -53,6 +54,15 @@ final class CameraModel: ObservableObject {
     }
 
     func beginImport() { composition.reset(); isProcessing = true }
+
+    func invalidateCameraFrame() {
+        stateLock.lock()
+        // Camera lifecycle changes must not cancel an imported-photo render.
+        cameraFrameGeneration += 1
+        stateLock.unlock()
+        preview = nil
+        composition.reset()
+    }
 
     func focus(at croppedPoint: CGPoint) {
         stateLock.lock(); let size = frameSize; stateLock.unlock()
@@ -165,6 +175,7 @@ final class CameraModel: ObservableObject {
         lastFrameTime = now
         let snapshot = renderSettings
         let version = revision
+        let frameGeneration = cameraFrameGeneration
         stateLock.unlock()
         let input = CIImage(cvPixelBuffer: buffer)
         renderQueue.async { [weak self] in
@@ -182,10 +193,12 @@ final class CameraModel: ObservableObject {
                 }
                 let originalFrame = analysisFrame
                 DispatchQueue.main.async {
-                    self.stateLock.lock(); let valid = version == self.revision; self.stateLock.unlock()
-                    if valid && !self.isEditing {
+                    self.stateLock.lock()
+                    let valid = version == self.revision && frameGeneration == self.cameraFrameGeneration
+                    self.stateLock.unlock()
+                    if valid && !self.isEditing && self.camera.isRunning {
                         self.preview = image
-                        if let originalFrame, self.camera.isRunning { self.composition.consume(originalFrame) }
+                        if let originalFrame { self.composition.consume(originalFrame) }
                     }
                 }
             } catch {

@@ -40,3 +40,19 @@ targets:
         CODE_SIGN_STYLE: Automatic
     scheme:
       gatherCoverageData: false
+      testTargets:
+        - DokaTests
+  DokaTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: tests/ios
+    dependencies:
+      - target: Doka
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.doublesam.doka.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"

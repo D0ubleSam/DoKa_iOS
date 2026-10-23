@@ -78,9 +78,12 @@ private struct CameraContent: View {
         .onChange(of: camera.errorMessage) { _, message in
             if camera.isRunning, let message { model.errorMessage = message }
         }
-        .onChange(of: camera.position) { _, _ in model.composition.reset() }
+        .onChange(of: camera.position) { _, _ in model.invalidateCameraFrame() }
         .onChange(of: camera.state) { _, state in
-            if state != .ready { model.composition.reset() }
+            if state != .ready { model.invalidateCameraFrame() }
+        }
+        .onChange(of: camera.zoomFactor) { _, _ in
+            if model.composition.isAnalyzing { model.composition.reset() }
         }
     }
 

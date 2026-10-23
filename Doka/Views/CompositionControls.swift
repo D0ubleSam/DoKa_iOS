@@ -39,6 +39,18 @@ struct CompositionControls: View {
             NavigationStack {
                 List {
                     if let result = composition.result {
+                        if let target = composition.targetPreview {
+                            Section("推荐画面") {
+                                Image(uiImage: target).resizable().scaledToFit()
+                            }
+                        }
+                        if let zoom = result.suggestedZoomFactor {
+                            Section("推荐变焦") {
+                                Text(String(format: "%.1f×", zoom))
+                                Text("对照推荐画面调整取景；大幅变焦后可能需要重新分析。")
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }
                         if !result.reason.isEmpty { Section("构图说明") { Text(result.reason) } }
                         Section("推荐滤镜") {
                             if result.recommendations.isEmpty { Text("此次分析没有返回滤镜推荐").foregroundStyle(.secondary) }
@@ -79,6 +91,7 @@ struct AILoginView: View {
     @State private var busy = false
     @State private var cooldownUntil = Date.distantPast
     @State private var message: String?
+    @State private var authenticationTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -111,11 +124,13 @@ struct AILoginView: View {
             .navigationTitle("登录 Doka").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("返回") { dismiss() }.disabled(busy) } }
         }
+        .interactiveDismissDisabled(busy)
+        .onDisappear { authenticationTask?.cancel() }
     }
 
     private func sendCode() {
         busy = true
-        Task { @MainActor in
+        authenticationTask = Task { @MainActor in
             defer { busy = false }
             do {
                 try await AIService.shared.sendCode(phone: phone)
@@ -127,7 +142,7 @@ struct AILoginView: View {
 
     private func login() {
         busy = true
-        Task { @MainActor in
+        authenticationTask = Task { @MainActor in
             defer { busy = false }
             do {
                 try await AIService.shared.login(phone: phone, code: code)

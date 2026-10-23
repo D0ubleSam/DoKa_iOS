@@ -1,5 +1,6 @@
 import Foundation
 import CoreGraphics
+import Security
 
 struct AIFilterRecommendation: Identifiable, Equatable {
     let filterName: String
@@ -18,6 +19,7 @@ struct AICompositionResult {
 
 enum AIServiceError: LocalizedError {
     case authenticationRequired
+    case compositionUnavailable
     case invalidPhone
     case invalidVerificationCode
     case invalidImage
@@ -36,6 +38,7 @@ enum AIServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .authenticationRequired: return "请先登录 Doka 账号，或重新登录后再试。"
+        case .compositionUnavailable: return "当前 Doka 账号没有可用构图次数或有效会员权益。请在原版 Doka 中检查账号权益。"
         case .invalidPhone: return "请输入有效的 11 位手机号码。"
         case .invalidVerificationCode: return "请输入收到的短信验证码。"
         case .invalidImage: return "当前画面无法用于构图，请重新取景。"
@@ -67,6 +70,26 @@ struct AIAuthPayload: Decodable {
     let token: String?
 }
 
+struct AIEntitlementPayload: Decodable {
+    let isVIP: Bool
+    let remainingCount: Int
+
+    private enum CodingKeys: String, CodingKey {
+        case is_vip, remaining_compose_count, ai_compose_remaining_count, remaining_free_count
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        isVIP = try values.decodeIfPresent(Bool.self, forKey: .is_vip) ?? false
+        let compose = try values.decodeIfPresent(Int.self, forKey: .remaining_compose_count)
+        let alternate = try values.decodeIfPresent(Int.self, forKey: .ai_compose_remaining_count)
+        let legacy = try values.decodeIfPresent(Int.self, forKey: .remaining_free_count)
+        remainingCount = max(0, compose ?? alternate ?? legacy ?? 0)
+    }
+
+    var canCompose: Bool { isVIP || remainingCount > 0 }
+}
+
 struct AICameraPayload: Decodable {
     let ExifFocalLength: String?
     let ComposeReason: String?
@@ -91,7 +114,9 @@ struct AICameraPayload: Decodable {
         ComposeReason = try values.decodeIfPresent(String.self, forKey: .ComposeReason)
         LeftTopCrd = try values.decodeIfPresent([Double].self, forKey: .LeftTopCrd)
         RightDownCrd = try values.decodeIfPresent([Double].self, forKey: .RightDownCrd)
-        SubAreaRectNorm = try values.decodeIfPresent(AINormalizedRect.self, forKey: .SubAreaRectNorm)
+        // Older responses may include an empty/partial normalized object along
+        // with the legacy pixel coordinates. Keep that independent fallback usable.
+        SubAreaRectNorm = try? values.decode(AINormalizedRect.self, forKey: .SubAreaRectNorm)
         AiCameraFilter = try values.decodeIfPresent(AIFilterPayload.self, forKey: .AiCameraFilter)
         AiCameraFilters = try values.decodeIfPresent([AIFilterPayload].self, forKey: .AiCameraFilters)
     }
@@ -99,8 +124,8 @@ struct AICameraPayload: Decodable {
     func result(imageWidth: Int, imageHeight: Int) throws -> AICompositionResult {
         guard imageWidth > 0, imageHeight > 0 else { throw AIServiceError.invalidImage }
         let rect: CGRect
-        if let normalized = SubAreaRectNorm {
-            rect = try normalized.validatedRect()
+        if let normalized = SubAreaRectNorm, let valid = try? normalized.validatedRect() {
+            rect = valid
         } else if let left = LeftTopCrd, let right = RightDownCrd,
                   left.count == 2, right.count == 2 {
             rect = try AINormalizedRect(
@@ -109,7 +134,7 @@ struct AICameraPayload: Decodable {
                 height: (right[1] - left[1]) / Double(imageHeight)
             ).validatedRect()
         } else {
-            throw AIServiceError.missingComposition
+            throw SubAreaRectNorm == nil ? AIServiceError.missingComposition : AIServiceError.invalidComposition
         }
         var seen = Set<String>()
         let filters = (AiCameraFilters ?? []) + (AiCameraFilter.map { [$0] } ?? [])
@@ -152,7 +177,7 @@ struct AINormalizedRect: Decodable {
 
     func validatedRect() throws -> CGRect {
         guard [x, y, width, height].allSatisfy({ $0.isFinite }),
-              x >= 0, y >= 0, width > 0, height > 0,
+              x >= 0, y >= 0, x < 1, y < 1, width > 0, height > 0,
               x + width <= 1.000001, y + height <= 1.000001 else {
             throw AIServiceError.invalidComposition
         }
